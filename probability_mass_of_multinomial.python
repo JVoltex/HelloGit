@@ -1,0 +1,20 @@
+# coding: utf-8
+# Your code here!
+
+N = 8
+K = 2
+VALS = [8, 0]
+
+i = 1
+a = 1
+p = (1/K)
+for v in VALS:
+    for d in range(v):
+        d += 1
+        print(str(i)+","+str(d)+","+str(p), end="")
+        r = i*p/d
+        print(","+str(r), end="")
+        a *= r
+        print(","+str(a), end="")
+        print("")
+        i += 1
