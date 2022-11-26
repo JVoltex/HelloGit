@@ -1,0 +1,104 @@
+# coding: utf-8
+import math
+N = 8
+K = 4
+P = 1/K
+
+def num_of_same_val(list):
+    res=[]
+    n = 1
+    if not list:
+        return res
+    prev = list[0]
+    for e in list[1:]:
+        if e == prev:
+            n += 1
+        else:
+            res.append(n)
+            n = 1
+        prev = e
+    res.append(n)
+    return res
+
+def num_of_comb(list):
+    l = len(list)
+    if l == 0:
+        return 1
+    r = math.factorial(l)
+    for n in num_of_same_val(list):
+        r /= math.factorial(n)
+    return r
+
+def prob_sub_product_term(v, base):
+    a = 1
+    for d in range(v):
+        d += 1
+        i = base + d
+        r = i*P/d
+        a *= r
+    return a
+   
+def sum_of_tree(k, r, l):
+    result = sum([p for (v, p) in M[k][r][l]])
+    return result
+   
+M = [[[[] for i in range(N+1)] for j in range(N+1)] for k in range(K)]
+
+# value history
+hist = []
+prob_max=[0 for i in range(N+1)]
+
+def comb(r, l, k):
+    print("enter k:"+str(k)+", r:"+str(r)+", l:"+str(l))
+    if k == 0:
+        for h_ in range(K-(k+1)):
+            print("-", end="")
+        print(str(k)+","+str(r))
+        p = prob_sub_product_term(r, 0)
+        M[k][r][l].append((r, p))
+       
+        print("(", end="")
+        for hi in hist:
+            print(str(hi[0])+",",end="")
+            p *= hi[1]
+        print(str(r),end="")
+        hist.append((r, 1))
+        print(")", end="")
+        print(", prob(solo):" +str(p),end="")
+        p *= num_of_comb([v for (v,prob) in hist])
+        print(", prob(all patterns):" +str(p))
+        prob_max[hist[0][0]] += p
+        del hist[-1]
+        return
+   
+    for v in reversed(range(0,r+1)):
+        if v * (k+1) < r:
+            break
+        if v > l:
+            continue
+       
+        for h_ in range(K-(k+1)):
+            print("-", end="")
+        print(str(k)+","+str(v))
+        new_l = min([l, v, r-v])
+        p = prob_sub_product_term(v, r-v)
+        M[k][r][l].append((v, p))
+        if M[k-1][r-v][new_l]:
+            print("mem exists k:"+str(k-1)+", r:"+str(r-v)+", l:"+str(new_l))
+
+        hist.append((v,p))
+        comb(r-v, new_l, k-1)
+        del hist[-1]
+           
+
+
+
+comb(N,N,K-1)
+#print(M)
+
+exp = 0
+for i, p_m in enumerate(prob_max):
+    if p_m>0:
+        print("max:"+str(i) + ", prob:"+str(p_m))
+        exp += i * p_m
+print("expected max:" + str(exp))
